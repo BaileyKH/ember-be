@@ -1,4 +1,5 @@
-import { pgTable, timestamp, varchar, uuid, text } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, varchar, uuid, text, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export type NewUser = typeof users.$inferInsert;
 export type ExistingUser = typeof users.$inferSelect;
@@ -14,4 +15,6 @@ export const users = pgTable("users", {
     profileImg: text("profile_image"),
     username: varchar("username", { length: 30 }).notNull(),
     hashedPassword: varchar("hashed_password").notNull(),
-})
+}, (table) => [
+  uniqueIndex("users_username_lower_unique").on(sql`lower(${table.username})`),
+])

@@ -23,3 +23,13 @@ export class NotFoundError extends Error {
         super(message);
     }
 }
+
+
+export function getDBViolation(err: unknown): string | null {
+    const e = err as any;
+    const code = e?.cause?.code ?? e?.code;
+
+    if (code !== "23505") return null;
+
+    return e?.cause?.constraint_name ?? e?.contraint_name ?? e?.contraint ?? "";
+}

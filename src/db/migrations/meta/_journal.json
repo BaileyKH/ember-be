@@ -8,6 +8,13 @@
       "when": 1784563256223,
       "tag": "0000_awesome_leo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784568919036,
+      "tag": "0001_lyrical_whirlwind",
+      "breakpoints": true
     }
   ]
 }
