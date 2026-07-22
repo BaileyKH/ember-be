@@ -3,6 +3,7 @@ import { sql } from "drizzle-orm";
 
 export type NewUser = typeof users.$inferInsert;
 export type ExistingUser = typeof users.$inferSelect;
+export type PublicUser = Omit<ExistingUser, "hashedPassword">
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().defaultRandom(),

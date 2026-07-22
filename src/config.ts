@@ -4,24 +4,29 @@ process.loadEnvFile()
 
 export type ApiConfig = {
     port: string,
-    platform: string
+    platform: string,
+    jwtSecret: string,
 }
 
 export type DBConfig = {
     dbUrl: string,
+    defaultDuration: number
 }
 
 const DBURL = envOrThrow("DB_URL")
 const PORT = envOrThrow("PORT")
 const PLATFORM = envOrThrow("PLATFORM")
+const JWTSECRET = envOrThrow("JWT_SECRET")
 
 export const cfg: { api: ApiConfig, db: DBConfig } = {
     api: {
         port: PORT,
-        platform: PLATFORM
+        platform: PLATFORM,
+        jwtSecret: JWTSECRET
     },
     db : {
-        dbUrl: DBURL
+        dbUrl: DBURL,
+        defaultDuration: 3600
     }
 }
 

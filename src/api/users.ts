@@ -1,10 +1,8 @@
 import { Request, Response } from "express";
-import { ExistingUser } from "../db/schema.js";
+import { PublicUser } from "../db/schema.js";
 import { createUser } from "../db/queries/users.js";
 import { hashPassword } from "../auth.js";
 import { BadRequestError, getDBViolation } from "./errors.js";
-
-type PublicUser = Omit<ExistingUser, "hashedPassword">
 
 export async function createUserHandler(req: Request, res: Response) {
     const { email, username, password } = req.body
