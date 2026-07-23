@@ -4,11 +4,20 @@ import { middlewareErrorHandler } from "./api/middleware.js"
 import { createUserHandler } from "./api/users.js"
 import { loginHandler, refreshHandler, revokeHandler } from "./api/auth.js"
 import { deleteUsersHandler } from "./api/reset.js"
+import { newTripHandler, getAllTripsHandler, getTripHandler } from "./api/trips.js"
 
 const app = express()
 const PORT = cfg.api.port
 
 app.use(express.json())
+
+app.get("/api/trips", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(getAllTripsHandler(req, res)).catch(next)
+})
+
+app.get("/api/trips/:tripId", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(getTripHandler(req, res)).catch(next)
+})
 
 app.post("/api/users", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(createUserHandler(req, res)).catch(next)
@@ -24,6 +33,10 @@ app.post("/api/refresh", (req: Request, res: Response, next: NextFunction) => {
 
 app.post("/api/revoke", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(revokeHandler(req, res)).catch(next)
+})
+
+app.post("/api/trips", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(newTripHandler(req, res)).catch(next)
 })
 
 // FOR DEVELOPMENT ONLY

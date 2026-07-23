@@ -43,19 +43,25 @@ export function makeJWT(userId: string, expiresIn: number, secret: string): stri
 }
 
 export function validateJWT(token: string, secret: string): string {
-    const decodedJWT = jwt.verify(token, secret) as jwt.JwtPayload;
+    try {
+        const decodedJWT = jwt.verify(token, secret, { algorithms: ["HS256"] }) as jwt.JwtPayload;
 
-    if (decodedJWT.iss !== ACCESS_TOKEN_ISSUER) {
-        throw new UserNotAuthenticatedError("Invalid Issuer");
+        if (decodedJWT.iss !== ACCESS_TOKEN_ISSUER) {
+            throw new UserNotAuthenticatedError("Invalid Issuer");
+        }
+
+        const userId = decodedJWT.sub;
+
+        if (!userId) {
+            throw new UserNotAuthenticatedError("Missing User");
+        }
+
+        return userId;
+
+    } catch {
+
+        throw new UserNotAuthenticatedError("Invalid or expired token")
     }
-
-    const userId = decodedJWT.sub;
-
-    if (!userId) {
-        throw new UserNotAuthenticatedError("Missing User");
-    }
-
-    return userId;
 }
 
 export function getBearerToken(req: Request): string {

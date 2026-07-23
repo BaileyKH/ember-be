@@ -22,6 +22,27 @@
       "when": 1784817447019,
       "tag": "0002_late_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784825279970,
+      "tag": "0003_unknown_mongu",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1784825471514,
+      "tag": "0004_worthless_the_initiative",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784826286426,
+      "tag": "0005_goofy_wallop",
+      "breakpoints": true
     }
   ]
 }
