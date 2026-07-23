@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express"
 import { cfg } from "./config.js"
 import { middlewareErrorHandler } from "./api/middleware.js"
 import { createUserHandler } from "./api/users.js"
-import { loginHandler } from "./api/auth.js"
+import { loginHandler, refreshHandler, revokeHandler } from "./api/auth.js"
 import { deleteUsersHandler } from "./api/reset.js"
 
 const app = express()
@@ -18,6 +18,15 @@ app.post("/api/login", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(loginHandler(req, res)).catch(next)
 })
 
+app.post("/api/refresh", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(refreshHandler(req, res)).catch(next)
+})
+
+app.post("/api/revoke", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(revokeHandler(req, res)).catch(next)
+})
+
+// FOR DEVELOPMENT ONLY
 app.post("/api/reset", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(deleteUsersHandler(cfg.api, req, res)).catch(next)
 })

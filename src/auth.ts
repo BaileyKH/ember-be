@@ -2,6 +2,7 @@ import { Request } from "express";
 import * as argon2 from "argon2"
 import jwt from "jsonwebtoken";
 import { JwtPayload } from "jsonwebtoken";
+import crypto from "crypto";
 import { UserNotAuthenticatedError } from "./api/errors.js";
 
 type payload = Pick<JwtPayload, "iss" | "sub" | "iat" | "exp">;
@@ -70,4 +71,10 @@ export function getBearerToken(req: Request): string {
     }
 
     return authString[1]
+}
+
+export function makeRefreshToken() {
+    const refreshToken = crypto.randomBytes(32).toString("hex")
+
+    return refreshToken
 }
