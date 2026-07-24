@@ -44,17 +44,14 @@ export async function getAllTripsHandler(req: Request, res: Response) {
 
     const trips = await getAllUsersTrips(authUser)
 
-    if (!trips || trips.length === 0) {
-        return res.status(200).json([])
-    }
-
     return res.status(200).json(trips)
 }
 
 export async function getTripHandler(req: Request, res: Response) {
+    const authUser = await authenticateUser(req)
     const tripId = validateID(req.params.tripId)
 
-    const trip = await getUsersTrip(tripId)
+    const trip = await getUsersTrip(tripId, authUser)
 
     if (!trip) {
         throw new NotFoundError("Could not find specified trip")

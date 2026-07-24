@@ -1,6 +1,6 @@
 import { db } from "../index.js";
 import { NewTrip, tripMembers, trips } from "../schema.js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, getTableColumns, desc } from "drizzle-orm";
 
 type TripDetails = Omit<NewTrip, "ownerId">;
 
@@ -28,23 +28,31 @@ export async function createTrip(trip: TripDetails, ownerId: string){
         return createdTrip;
     });
 }
-
-// BAILEY NOTE: will need to update this to include trips where users are members as well 
-export async function getAllUsersTrips(ownerId: string) {
+ 
+export async function getAllUsersTrips(userId: string) {
     const result = await db
-        .select()
+        .select({
+            ...getTableColumns(trips)
+        })
         .from(trips)
-        .where(eq(trips.ownerId, ownerId))
+        .innerJoin(tripMembers, eq(tripMembers.tripId, trips.id))
+        .where(eq(tripMembers.userId, userId))
+        .orderBy(desc(trips.createdAt))
 
     return result
 }
 
-// BAILEY NOTE: will need to update this to only allow if user is member or owner of specific trip
-export async function getUsersTrip(tripId: string) {
+export async function getUsersTrip(tripId: string, userId: string) {
     const [trip] = await db
-        .select()
+        .select({
+            ...getTableColumns(trips)
+        })
         .from(trips)
-        .where(eq(trips.id, tripId))
+        .innerJoin(tripMembers, eq(tripMembers.tripId, trips.id))
+        .where(and(
+            eq(trips.id, tripId),
+            eq(tripMembers.userId, userId)
+        ))
 
     return trip
 }
