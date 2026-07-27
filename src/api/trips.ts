@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
+import { type TripUpdates } from "../db/queries/trips.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
-import { createTrip, deleteTrip, getAllUsersTrips, getUsersTrip } from "../db/queries/trips.js";
+import { createTrip, deleteTrip, editTrip, getAllUsersTrips, getUsersTrip } from "../db/queries/trips.js";
 import { authenticateUser } from "./authenticate.js";
 
 const MAX_TRIP_TEXT_LENGTH = 256
@@ -58,6 +59,59 @@ export async function getTripHandler(req: Request, res: Response) {
     }
 
     return res.status(200).json(trip)
+}
+
+export async function editTripHandler(req: Request, res: Response) {
+    const authUser = await authenticateUser(req)
+    const tripId = validateID(req.params.tripId)
+
+    const { name, location, description, bannerImg, startDate, endDate } = req.body ?? {}
+
+    const updates: TripUpdates = {}
+
+    if (name !== undefined) {
+        updates.name = validateRequiredText(name, "name", MAX_TRIP_TEXT_LENGTH)
+    }
+
+    if (location !== undefined) {
+        updates.location = validateRequiredText(location, "location", MAX_TRIP_TEXT_LENGTH)
+    }
+
+    if (description !== undefined) {
+        updates.description = validateOptionalText(description, "description", MAX_TRIP_TEXT_LENGTH)
+    }
+
+    if (bannerImg !== undefined) {
+        if (bannerImg !== null && typeof bannerImg !== "string") {
+            throw new BadRequestError("Please provide a valid image")
+        }
+
+        updates.bannerImg = bannerImg?.trim() || null
+    }
+
+    if (startDate !== undefined) {
+        updates.startDate = validateDate(startDate, "start date")
+    }
+
+    if (endDate !== undefined) {
+        updates.endDate = validateDate(endDate, "end date")
+    }
+
+    if (Object.keys(updates).length === 0) {
+        throw new BadRequestError("At least one trip detail must be provided")
+    }
+
+    const updatedTrip = await editTrip(tripId, authUser, updates)
+
+    if (updatedTrip.status === "not_found") {
+        throw new NotFoundError("Could not find specified trip")
+    }
+
+    if (updatedTrip.status === "invalid_date_order") {
+        throw new BadRequestError("End date can not be before start date")
+    }
+
+    return res.status(200).json(updatedTrip.trip)
 }
 
 export async function deleteTripHandler(req: Request, res: Response) {
