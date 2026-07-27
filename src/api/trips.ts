@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { BadRequestError, NotFoundError } from "./errors.js";
-import { createTrip, getAllUsersTrips, getUsersTrip } from "../db/queries/trips.js";
+import { createTrip, deleteTrip, getAllUsersTrips, getUsersTrip } from "../db/queries/trips.js";
 import { authenticateUser } from "./authenticate.js";
 
 const MAX_TRIP_TEXT_LENGTH = 256
@@ -58,6 +58,19 @@ export async function getTripHandler(req: Request, res: Response) {
     }
 
     return res.status(200).json(trip)
+}
+
+export async function deleteTripHandler(req: Request, res: Response) {
+    const authUser = await authenticateUser(req)
+    const tripId = validateID(req.params.tripId)
+
+    const deletedTrip = await deleteTrip(tripId, authUser)
+
+    if (!deletedTrip) {
+        throw new NotFoundError("Could not find specified trip")
+    }
+
+    return res.status(204).send()
 }
 
 export function validateRequiredText(text: unknown, field: string, maxLength: number): string {

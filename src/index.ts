@@ -4,7 +4,7 @@ import { middlewareErrorHandler } from "./api/middleware.js"
 import { createUserHandler } from "./api/users.js"
 import { loginHandler, refreshHandler, revokeHandler } from "./api/auth.js"
 import { deleteUsersHandler } from "./api/reset.js"
-import { newTripHandler, getAllTripsHandler, getTripHandler } from "./api/trips.js"
+import { newTripHandler, getAllTripsHandler, getTripHandler, deleteTripHandler } from "./api/trips.js"
 
 const app = express()
 const PORT = cfg.api.port
@@ -37,6 +37,10 @@ app.post("/api/revoke", (req: Request, res: Response, next: NextFunction) => {
 
 app.post("/api/trips", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(newTripHandler(req, res)).catch(next)
+})
+
+app.delete("/api/trips/:tripId", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(deleteTripHandler(req, res)).catch(next)
 })
 
 // FOR DEVELOPMENT ONLY
