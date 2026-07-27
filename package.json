@@ -30,6 +30,7 @@
     "vitest": "^3.2.7"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.9",
     "argon2": "^0.45.0",
     "drizzle-orm": "^0.45.2",
     "express": "^5.2.1",

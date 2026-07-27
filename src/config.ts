@@ -10,13 +10,17 @@ export type ApiConfig = {
 
 export type DBConfig = {
     dbUrl: string,
-    defaultDuration: number
+    defaultDuration: number,
+    supabaseUrl: string,
+    supabaseSecret: string
 }
 
 const DBURL = envOrThrow("DB_URL")
 const PORT = envOrThrow("PORT")
 const PLATFORM = envOrThrow("PLATFORM")
 const JWTSECRET = envOrThrow("JWT_SECRET")
+const SUPABASEURL = envOrThrow("SUPABASE_URL")
+const SUPABASESECRET = envOrThrow("SUPABASE_SECRET")
 
 export const cfg: { api: ApiConfig, db: DBConfig } = {
     api: {
@@ -26,7 +30,9 @@ export const cfg: { api: ApiConfig, db: DBConfig } = {
     },
     db : {
         dbUrl: DBURL,
-        defaultDuration: 3600
+        defaultDuration: 3600,
+        supabaseUrl: SUPABASEURL,
+        supabaseSecret: SUPABASESECRET
     }
 }
 
