@@ -29,6 +29,28 @@ export async function getUserByEmail(email: string) {
     return user
 }
 
+export async function updateUserProfileImg(userId: string, imgPath: string) {
+    return db.transaction(async (tx) => {
+        const [existingUser] = await tx
+            .select({ profileImg: users.profileImg })
+            .from(users)
+            .where(eq(users.id, userId))
+            .for("update")
+
+        if (!existingUser) return undefined
+
+        const [updatedUser] = await tx
+            .update(users)
+            .set({ profileImg: imgPath })
+            .where(eq(users.id, userId))
+            .returning({profileImg: users.profileImg})
+
+        if (!updatedUser) return undefined
+
+        return { profileImg: updatedUser.profileImg, previousPath: existingUser.profileImg }
+    })
+}
+
 
 // FOR DEVELOPMENT ONLY
 export async function deleteAllUsers() {
