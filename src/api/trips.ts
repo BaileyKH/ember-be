@@ -121,13 +121,23 @@ export async function deleteTripHandler(req: Request, res: Response) {
         throw new NotFoundError("Could not find specified trip")
     }
 
-    if (deletedTrip.bannerImg) {
+    if (deletedTrip.trip.bannerImg) {
         const { error: cleanupError } = await supabaseAdmin.storage
             .from("trip-banners")
-            .remove([deletedTrip.bannerImg])
+            .remove([deletedTrip.trip.bannerImg])
 
         if (cleanupError) {
             console.error("Failed to delete trip banner", cleanupError.message)
+        }
+    }
+
+    if (deletedTrip.photoPaths.length > 0) {
+        const { error: cleanupError } = await supabaseAdmin.storage
+            .from("trip-photos")
+            .remove(deletedTrip.photoPaths)
+
+        if (cleanupError) {
+            console.error("Failed to delete trip photos", cleanupError.message)
         }
     }
 

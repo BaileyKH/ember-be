@@ -43,6 +43,13 @@
       "when": 1784826286426,
       "tag": "0005_goofy_wallop",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785352766777,
+      "tag": "0006_flashy_kulan_gath",
+      "breakpoints": true
     }
   ]
 }

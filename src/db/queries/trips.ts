@@ -1,6 +1,7 @@
 import { db } from "../index.js";
 import { NewTrip, tripMembers, trips, ExistingTrip } from "../schema.js";
 import { and, eq, getTableColumns, desc } from "drizzle-orm";
+import { tripPhotos } from "../schema.js";
 
 type TripDetails = Omit<NewTrip, "ownerId" | "bannerImg">;
 export type TripUpdates = Partial<Pick<NewTrip, "name" | "location" | "description" | "startDate" | "endDate">>
@@ -72,15 +73,37 @@ export async function getOwnedTrip(tripId: string, userId: string) {
 }
 
 export async function deleteTrip(tripId: string, userId: string) {
-    const [result] =  await db
-        .delete(trips)
-        .where(and(
-            eq(trips.id, tripId),
-            eq(trips.ownerId, userId)
-        ))
-        .returning()
+    return db.transaction(async (tx) => {
+        const [existingTrip] = await tx 
+            .select()
+            .from(trips)
+            .where(and(
+                eq(trips.id, tripId),
+                eq(trips.ownerId, userId)
+            ))
+            .for("update")
 
-    return result
+        if (!existingTrip) return undefined
+
+        const photos = await tx
+            .select({imagePath: tripPhotos.imagePath, thumbnailPath: tripPhotos.thumbnailPath})
+            .from(tripPhotos)
+            .where(eq(tripPhotos.tripId, tripId))
+
+        const [deletedTrip] = await tx
+            .delete(trips)
+            .where(and(
+                eq(trips.id, tripId),
+                eq(trips.ownerId, userId)
+            ))
+            .returning()
+
+        if (!deletedTrip) return undefined
+
+        const photoPaths = photos.flatMap(photo => [photo.imagePath, photo.thumbnailPath])
+
+        return { trip: deletedTrip, photoPaths }
+    })
 
 }
 

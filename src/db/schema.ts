@@ -1,4 +1,4 @@
-import { pgTable, timestamp, varchar, uuid, text, uniqueIndex, date, index } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, varchar, uuid, text, uniqueIndex, date, index, integer } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export type NewUser = typeof users.$inferInsert;
@@ -60,9 +60,23 @@ export const tripMembers = pgTable("trip_members", {
     tripId: uuid("trip_id").references(() => trips.id, { onDelete: "cascade" }).notNull(),
     userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
 }, (table) => [
-    uniqueIndex("trip_members_trip_user_unique")
-        .on(table.tripId, table.userId),
+    uniqueIndex("trip_members_trip_user_unique").on(table.tripId, table.userId),
+    index("trip_members_user_id_idx").on(table.userId)
+])
 
-    index("trip_members_user_id_idx")
-        .on(table.userId),
+export type NewTripPhoto = typeof tripPhotos.$inferInsert
+export type ExistingTripPhoto = typeof tripPhotos.$inferSelect
+
+export const tripPhotos = pgTable("trip_photos", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    tripId: uuid("trip_id").references(() => trips.id, { onDelete: "cascade" }).notNull(),
+    uploadedById: uuid("uploaded_by").references(() => users.id, { onDelete: "set null" }),
+    imagePath: text("image_path").notNull().unique(),
+    thumbnailPath: text("thumbnail_path").notNull().unique(),
+    width: integer("width").notNull(),
+    height: integer("height").notNull(),
+}, (table) => [
+    index("trip_photos_trip_created_idx").on(table.tripId, table.createdAt, table.id),
+    index("trip_photos_uploaded_by_idx").on(table.uploadedById)
 ])
