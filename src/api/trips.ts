@@ -3,6 +3,7 @@ import { type TripUpdates } from "../db/queries/trips.js";
 import { BadRequestError, NotFoundError } from "./errors.js";
 import { createTrip, deleteTrip, editTrip, getAllUsersTrips, getUsersTrip } from "../db/queries/trips.js";
 import { authenticateUser } from "./authenticate.js";
+import { createTripBannerUrl, supabaseAdmin } from "../db/storage.js";
 
 const MAX_TRIP_TEXT_LENGTH = 256
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
@@ -10,7 +11,7 @@ const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
 export async function newTripHandler(req: Request, res: Response) {
     const authUser = await authenticateUser(req)
 
-    const { name, location, description, bannerImg, startDate, endDate } = req.body ?? {}
+    const { name, location, description, startDate, endDate } = req.body ?? {}
 
     const validName = validateRequiredText(name, "name", MAX_TRIP_TEXT_LENGTH)
     const validLocation = validateRequiredText(location, "location", MAX_TRIP_TEXT_LENGTH)
@@ -22,15 +23,10 @@ export async function newTripHandler(req: Request, res: Response) {
         throw new BadRequestError("End date cannot be before start date")
     }
 
-    if (bannerImg !== undefined && bannerImg !== null && typeof bannerImg !== "string") {
-        throw new BadRequestError("Please provide a valid image")
-    }
-
     const newTrip = {
         name: validName,
         location: validLocation,
         description: validDescription,
-        bannerImg: bannerImg?.trim() || null,
         startDate: validStartDate,
         endDate: validEndDate,
     }
@@ -45,7 +41,12 @@ export async function getAllTripsHandler(req: Request, res: Response) {
 
     const trips = await getAllUsersTrips(authUser)
 
-    return res.status(200).json(trips)
+    const tripsWithBanners = await Promise.all(trips.map(async (trip) => ({
+        ...trip,
+        bannerImg: await createTripBannerUrl(trip.bannerImg)
+    })))
+
+    return res.status(200).json(tripsWithBanners)
 }
 
 export async function getTripHandler(req: Request, res: Response) {
@@ -58,14 +59,16 @@ export async function getTripHandler(req: Request, res: Response) {
         throw new NotFoundError("Could not find specified trip")
     }
 
-    return res.status(200).json(trip)
+    const bannerUrl = await createTripBannerUrl(trip.bannerImg)
+
+    return res.status(200).json({ ...trip, bannerImg: bannerUrl })
 }
 
 export async function editTripHandler(req: Request, res: Response) {
     const authUser = await authenticateUser(req)
     const tripId = validateID(req.params.tripId)
 
-    const { name, location, description, bannerImg, startDate, endDate } = req.body ?? {}
+    const { name, location, description, startDate, endDate } = req.body ?? {}
 
     const updates: TripUpdates = {}
 
@@ -79,14 +82,6 @@ export async function editTripHandler(req: Request, res: Response) {
 
     if (description !== undefined) {
         updates.description = validateOptionalText(description, "description", MAX_TRIP_TEXT_LENGTH)
-    }
-
-    if (bannerImg !== undefined) {
-        if (bannerImg !== null && typeof bannerImg !== "string") {
-            throw new BadRequestError("Please provide a valid image")
-        }
-
-        updates.bannerImg = bannerImg?.trim() || null
     }
 
     if (startDate !== undefined) {
@@ -111,7 +106,9 @@ export async function editTripHandler(req: Request, res: Response) {
         throw new BadRequestError("End date can not be before start date")
     }
 
-    return res.status(200).json(updatedTrip.trip)
+    const bannerUrl = await createTripBannerUrl(updatedTrip.trip.bannerImg)
+
+    return res.status(200).json({ ...updatedTrip.trip, bannerImg: bannerUrl })
 }
 
 export async function deleteTripHandler(req: Request, res: Response) {
@@ -122,6 +119,16 @@ export async function deleteTripHandler(req: Request, res: Response) {
 
     if (!deletedTrip) {
         throw new NotFoundError("Could not find specified trip")
+    }
+
+    if (deletedTrip.bannerImg) {
+        const { error: cleanupError } = await supabaseAdmin.storage
+            .from("trip-banners")
+            .remove([deletedTrip.bannerImg])
+
+        if (cleanupError) {
+            console.error("Failed to delete trip banner", cleanupError.message)
+        }
     }
 
     return res.status(204).send()

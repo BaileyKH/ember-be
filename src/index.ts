@@ -5,7 +5,7 @@ import { createUserHandler } from "./api/users.js"
 import { loginHandler, refreshHandler, revokeHandler } from "./api/auth.js"
 import { deleteUsersHandler } from "./api/reset.js"
 import { newTripHandler, getAllTripsHandler, getTripHandler, deleteTripHandler, editTripHandler } from "./api/trips.js"
-import { updateProfileImgHandler } from "./api/images.js"
+import { updateProfileImgHandler, updateTripBannerImgHandler } from "./api/images.js"
 
 const app = express()
 const PORT = cfg.api.port
@@ -42,6 +42,10 @@ app.post("/api/trips", (req: Request, res: Response, next: NextFunction) => {
 
 app.put("/api/me/profile-image", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(updateProfileImgHandler(req, res)).catch(next)
+})
+
+app.put("/api/trips/:tripId/banner", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(updateTripBannerImgHandler(req, res)).catch(next)
 })
 
 app.patch("/api/trips/:tripId", (req, res, next) => {

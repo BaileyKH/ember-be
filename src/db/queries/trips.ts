@@ -2,8 +2,8 @@ import { db } from "../index.js";
 import { NewTrip, tripMembers, trips, ExistingTrip } from "../schema.js";
 import { and, eq, getTableColumns, desc } from "drizzle-orm";
 
-type TripDetails = Omit<NewTrip, "ownerId">;
-export type TripUpdates = Partial<Pick<NewTrip, "name" | "location" | "description" | "bannerImg" | "startDate" | "endDate">>
+type TripDetails = Omit<NewTrip, "ownerId" | "bannerImg">;
+export type TripUpdates = Partial<Pick<NewTrip, "name" | "location" | "description" | "startDate" | "endDate">>
 export type EditTripResult = | {status: "updated", trip: ExistingTrip} | {status: "not_found"} | {status: "invalid_date_order"}
 
 export async function createTrip(trip: TripDetails, ownerId: string){
@@ -59,6 +59,18 @@ export async function getUsersTrip(tripId: string, userId: string) {
     return trip
 }
 
+export async function getOwnedTrip(tripId: string, userId: string) {
+    const [trip] = await db
+        .select({ id: trips.id })
+        .from(trips)
+        .where(and(
+            eq(trips.id, tripId),
+            eq(trips.ownerId, userId)
+        ))
+
+    return trip
+}
+
 export async function deleteTrip(tripId: string, userId: string) {
     const [result] =  await db
         .delete(trips)
@@ -79,7 +91,7 @@ export async function editTrip(tripId: string, userId: string, data: TripUpdates
             .from(trips)
             .where(and(
                 eq(trips.id, tripId),
-                eq(trips.ownerId, userId),
+                eq(trips.ownerId, userId)
             ))
             .for("update")
 
@@ -100,7 +112,7 @@ export async function editTrip(tripId: string, userId: string, data: TripUpdates
             .set(data)
             .where(and(
                 eq(trips.id, tripId),
-                eq(trips.ownerId, userId),
+                eq(trips.ownerId, userId)
             ))
             .returning()
 
@@ -110,5 +122,33 @@ export async function editTrip(tripId: string, userId: string, data: TripUpdates
 
         return { status: "updated", trip: updatedTrip }
 
+    })
+}
+
+export async function updateTripBannerImg(tripId: string, userId: string, imgPath: string) {
+    return db.transaction(async (tx) => {
+        const [existingTrip] = await tx
+            .select({ bannerImg: trips.bannerImg })
+            .from(trips)
+            .where(and(
+                eq(trips.id, tripId),
+                eq(trips.ownerId, userId)
+            ))
+            .for("update")
+
+        if (!existingTrip) return undefined
+
+        const [updatedTrip] = await tx
+            .update(trips)
+            .set({ bannerImg: imgPath })
+            .where(and(
+                eq(trips.id, tripId),
+                eq(trips.ownerId, userId)
+            ))
+            .returning({bannerImg: trips.bannerImg})
+
+        if (!updatedTrip) return undefined
+
+        return { bannerImg: updatedTrip.bannerImg, previousPath: existingTrip.bannerImg }
     })
 }
