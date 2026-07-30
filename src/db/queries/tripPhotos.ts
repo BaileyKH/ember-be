@@ -107,7 +107,6 @@ export async function getTripPhoto(tripId: string, photoId: string, userId: stri
             tripId: tripPhotos.tripId,
             uploadedById: tripPhotos.uploadedById,
             imagePath: tripPhotos.imagePath,
-            thumbnailPath: tripPhotos.thumbnailPath,
             width: tripPhotos.width,
             height: tripPhotos.height,
             uploader: {

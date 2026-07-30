@@ -560,6 +560,55 @@ export async function getTripPhotosHandler(req: Request, res: Response) {
 
 }
 
-export async function getTripPhotoHandler(req: Request, res: Response) {}
+export async function getTripPhotoHandler(req: Request, res: Response) {
+    const authUser = await authenticateUser(req)
+    const tripId = validateID(req.params.tripId)
+
+    let photoId: string
+
+    try {
+        photoId = validateID(req.params.photoId)
+
+    } catch {
+        throw new BadRequestError("Could not find specified trip photo")
+    }
+
+    const photo = await getTripPhoto(tripId, photoId, authUser)
+
+    if (!photo) {
+        throw new NotFoundError("Could not find specified trip photo")
+    }
+
+    const { data: signedImage, error: signedImageError } = await supabaseAdmin.storage
+        .from("trip-photos")
+        .createSignedUrl(photo.imagePath, 60 * 60) 
+
+    if (signedImageError || !signedImage.signedUrl) {
+        throw new Error("Failed to create trip photo url")
+    }
+
+    let profileImg: string | null = null
+
+    if (photo.uploader?.profileImg) {
+        const { data } = supabaseAdmin.storage
+            .from("profile-images")
+            .getPublicUrl(photo.uploader.profileImg)
+
+        profileImg = data.publicUrl
+    }
+
+    const tripPhoto = {
+        id: photo.id,
+        createdAt: photo.createdAt,
+        tripId: photo.tripId,
+        uploadedById: photo.uploadedById,
+        width: photo.width,
+        height: photo.height,
+        imageUrl: signedImage.signedUrl,
+        uploader: photo.uploader ? { id: photo.uploader.id, username: photo.uploader.username, profileImg } : null
+    }
+
+    return res.status(200).json(tripPhoto)
+}
 
 export async function deleteTripPhotoHandler(req: Request, res: Response) {}
