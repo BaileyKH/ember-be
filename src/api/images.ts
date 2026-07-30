@@ -611,4 +611,32 @@ export async function getTripPhotoHandler(req: Request, res: Response) {
     return res.status(200).json(tripPhoto)
 }
 
-export async function deleteTripPhotoHandler(req: Request, res: Response) {}
+export async function deleteTripPhotoHandler(req: Request, res: Response) {
+    const authUser = await authenticateUser(req)
+    const tripId = validateID(req.params.tripId)
+
+    let photoId: string;
+
+    try {
+        photoId = validateID(req.params.photoId)
+
+    } catch {
+        throw new BadRequestError("Could not find specified trip")
+    }
+
+    const deletedPhoto = await deleteTripPhoto(tripId, photoId, authUser)
+
+    if (!deletedPhoto) {
+        throw new NotFoundError("Could not find specified trip photo")
+    }
+
+    const { error: cleanupError } = await supabaseAdmin.storage
+        .from("trip-photos")
+        .remove([deletedPhoto.imagePath, deletedPhoto.thumbnailPath])
+
+    if (cleanupError) {
+        console.error("Failed to delete trip photo files")
+    }
+
+    return res.status(204).send()
+}
