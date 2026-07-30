@@ -621,7 +621,7 @@ export async function deleteTripPhotoHandler(req: Request, res: Response) {
         photoId = validateID(req.params.photoId)
 
     } catch {
-        throw new BadRequestError("Could not find specified trip")
+        throw new BadRequestError("Invalid trip photo id")
     }
 
     const deletedPhoto = await deleteTripPhoto(tripId, photoId, authUser)
