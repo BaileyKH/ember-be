@@ -80,3 +80,22 @@ export const tripPhotos = pgTable("trip_photos", {
     index("trip_photos_trip_created_idx").on(table.tripId, table.createdAt, table.id),
     index("trip_photos_uploaded_by_idx").on(table.uploadedById)
 ])
+
+export type NewTripNote = typeof tripNotes.$inferInsert
+export type ExistingTripNote = typeof tripNotes.$inferSelect
+
+export const tripNotes = pgTable("trip_notes", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+        .notNull()
+        .defaultNow()
+        .$onUpdate(() => new Date()),
+    tripId: uuid("trip_id").references(() => trips.id, { onDelete: "cascade" }).notNull(),
+    title: varchar("title", { length: 256 }).notNull(),
+    content: text("content").notNull(),
+    createdById: uuid("created_by").references(() => users.id, { onDelete: "cascade" }).notNull()
+}, (table) => [
+    index("trip_notes_trip_user_created_idx").on(table.tripId, table.createdById, table.createdAt, table.id),
+    index("trip_notes_created_by_idx").on(table.createdById)
+])
