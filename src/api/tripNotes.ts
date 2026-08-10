@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { authenticateUser } from "./authenticate.js";
 import { type NewTripNoteData, type TripNoteUpdate, createTripNote, getTripNotes, getTripNote, editTripNote, deleteTripNote } from "../db/queries/tripNotes.js";
-import { NotFoundError, BadRequestError } from "./errors.js";
 import { validateID, validateRequiredText } from "./trips.js";
+import { NotFoundError, BadRequestError } from "./errors.js";
+
 
 const maxTitleLength = 256
 const maxContentLength = 10_000
