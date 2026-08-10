@@ -7,6 +7,7 @@ import { deleteUsersHandler } from "./api/reset.js"
 import { newTripHandler, getAllTripsHandler, getTripHandler, deleteTripHandler, editTripHandler } from "./api/trips.js"
 import { updateProfileImgHandler, updateTripBannerImgHandler } from "./api/images.js"
 import { addTripPhotoHandler, getTripPhotosHandler, getTripPhotoHandler, deleteTripPhotoHandler } from "./api/images.js"
+import { createTripNoteHandler, deleteTripNoteHandler, editTripNoteHandler, getTripNoteHandler, getTripNotesHandler } from "./api/tripNotes.js"
 
 const app = express()
 const PORT = cfg.api.port
@@ -27,6 +28,14 @@ app.get("/api/trips/:tripId/photos", (req: Request, res: Response, next: NextFun
 
 app.get("/api/trips/:tripId/photos/:photoId", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(getTripPhotoHandler(req, res)).catch(next)
+})
+
+app.get("/api/trips/:tripId/notes", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(getTripNotesHandler(req, res)).catch(next)
+})
+
+ app.get("/api/trips/:tripId/notes/:noteId", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(getTripNoteHandler(req, res)).catch(next)
 })
 
 app.post("/api/users", (req: Request, res: Response, next: NextFunction) => {
@@ -53,6 +62,10 @@ app.post("/api/trips/:tripId/photos", (req: Request, res: Response, next: NextFu
     Promise.resolve(addTripPhotoHandler(req, res)).catch(next)
 })
 
+app.post("/api/trips/:tripId/notes", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(createTripNoteHandler(req, res)).catch(next)
+})
+
 app.put("/api/me/profile-image", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(updateProfileImgHandler(req, res)).catch(next)
 })
@@ -65,12 +78,20 @@ app.patch("/api/trips/:tripId", (req, res, next) => {
     Promise.resolve(editTripHandler(req, res)).catch(next)
 })
 
+app.patch("/api/trips/:tripId/notes/:noteId", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(editTripNoteHandler(req, res)).catch(next)
+})
+
 app.delete("/api/trips/:tripId", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(deleteTripHandler(req, res)).catch(next)
 })
 
 app.delete("/api/trips/:tripId/photos/:photoId", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(deleteTripPhotoHandler(req, res)).catch(next)
+})
+
+app.delete("/api/trips/:tripId/notes/:noteId", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(deleteTripNoteHandler(req, res)).catch(next)
 })
 
 // FOR DEVELOPMENT ONLY
