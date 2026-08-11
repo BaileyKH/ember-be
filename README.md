@@ -11,10 +11,10 @@ The organized, collaborative, and memorable way to plan your next adventure. Emb
 Planning a trip often means juggling details across group chats, notes apps, and photo libraries. These tools can each handle one part of the process, but they make it difficult to keep plans and memories connected in one place. I built Ember to bring trip organization, shared photos, and personal notes together so friends, families, or even the solo-trip taker can coordinate their adventure and revisit their favorite moments with ease.
 
 ## Currently in Development:
-[] Add Members to Trips
-[] Remove Members from Trips
-[] Edit user profile information
-[] Owner transferring between trips
+- [ ] Add Members to Trips
+- [ ] Remove Members from Trips
+- [ ] Edit user profile information
+- [ ] Owner transferring between trips
 
 ## Quick Start
 1. Visit the [Ember website](https://tempwebsitefornow.com).
@@ -36,7 +36,7 @@ Users can create trips with a name, location, description, and optional travel d
 
 Trip dates use the `YYYY-MM-DD` format, and Ember prevents an end date from being set before the start date. Requests for trips outside the current user's membership return the same not-found response as nonexistent trips, avoiding disclosure of private trip IDs.
 
-### Profile Images and Trip Media
+### Profile Images and Trip Photos
 Image uploads use `multipart/form-data` with a single field named `image`. JPEG, PNG, and WebP files are decoded and verified before storage rather than being trusted by their filename or reported MIME type.
 
 | Media | Endpoint | Maximum upload | Processing | Visibility |
@@ -48,7 +48,7 @@ Image uploads use `multipart/form-data` with a single field named `image`. JPEG,
 Every accepted image is auto-oriented, converted to WebP, compressed, and written without its original metadata. Replacing a profile image or banner removes the previous object after the new database path is saved. Failed uploads and database writes trigger storage cleanup to reduce orphaned files.
 
 ### Shared Trip Galleries
-Every trip member can upload and view photos. Gallery responses use lightweight thumbnails, while the individual-photo endpoint returns the larger stored version only when a user opens it. Private Supabase objects are returned through signed URLs that expire after one hour.
+Every trip member can upload and view photos. Gallery responses use thumbnails, while the individual photo endpoint returns the larger stored version only when a user opens it. Private Supabase objects are returned through signed URLs that expire after an hour.
 
 | Method | Endpoint | Description | Access |
 | --- | --- | --- | --- |
