@@ -1,7 +1,7 @@
-<h1>
-  <img src="/docs/images/ember-logo.png" alt="Ember" height="300" align="center">
-  &nbsp;Backend
-</h1>
+<div align="center">
+  <img src="./docs/images/ember-logo.svg" alt="Ember" width="300">
+  <h2>Backend</h2>
+</div>
 
 The organized, collaborative, and memorable way to plan your next adventure. Ember brings trip details, shared photos, and personal notes together in one place. It's well-suited for everything from weekend getaways to longer group adventures.
 
