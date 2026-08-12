@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="/docs/images/ember-logo.png" alt="Ember" width="500">
+  <img src="/docs/images/ember-logo.png" alt="Ember" width="550">
 </div>
 
 ## Ember - Backend
