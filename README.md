@@ -1,8 +1,8 @@
 <div align="center">
-  <img src="/docs/images/ember-logo.png" alt="Ember" width="300">
-  <h2>Backend</h2>
+  <img src="/docs/images/ember-logo.png" alt="Ember" width="500">
 </div>
 
+## Ember - Backend
 The organized, collaborative, and memorable way to plan your next adventure. Ember brings trip details, shared photos, and personal notes together in one place. It's well-suited for everything from weekend getaways to longer group adventures.
 
 ### Coming Soon
