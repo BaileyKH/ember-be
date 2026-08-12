@@ -12,7 +12,7 @@ Planning a trip often means juggling details across group chats, notes apps, and
 
 ## Currently in Development:
 - [ ] Add Members to Trips
-- [ ] Remove Members from Trips
+- [x] Remove Members from Trips
 - [ ] Edit user profile information
 - [ ] Owner transferring between trips
 

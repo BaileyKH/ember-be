@@ -8,6 +8,7 @@ import { newTripHandler, getAllTripsHandler, getTripHandler, deleteTripHandler, 
 import { updateProfileImgHandler, updateTripBannerImgHandler } from "./api/images.js"
 import { addTripPhotoHandler, getTripPhotosHandler, getTripPhotoHandler, deleteTripPhotoHandler } from "./api/images.js"
 import { createTripNoteHandler, deleteTripNoteHandler, editTripNoteHandler, getTripNoteHandler, getTripNotesHandler } from "./api/tripNotes.js"
+import { leaveTripHandler, removeTripMemberHandler } from "./api/tripMembers.js"
 
 const app = express()
 const PORT = cfg.api.port
@@ -74,7 +75,7 @@ app.put("/api/trips/:tripId/banner", (req: Request, res: Response, next: NextFun
     Promise.resolve(updateTripBannerImgHandler(req, res)).catch(next)
 })
 
-app.patch("/api/trips/:tripId", (req, res, next) => {
+app.patch("/api/trips/:tripId", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(editTripHandler(req, res)).catch(next)
 })
 
@@ -84,6 +85,14 @@ app.patch("/api/trips/:tripId/notes/:noteId", (req: Request, res: Response, next
 
 app.delete("/api/trips/:tripId", (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(deleteTripHandler(req, res)).catch(next)
+})
+
+app.delete("/api/trips/:tripId/members/me", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(leaveTripHandler(req, res)).catch(next)
+})
+
+app.delete("/api/trips/:tripId/members/:memberId", (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(removeTripMemberHandler(req, res)).catch(next)
 })
 
 app.delete("/api/trips/:tripId/photos/:photoId", (req: Request, res: Response, next: NextFunction) => {
