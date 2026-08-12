@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./docs/images/ember-logo.svg" alt="Ember" width="300">
+  <img src="/docs/images/ember-logo.png" alt="Ember" width="300">
   <h2>Backend</h2>
 </div>
 
