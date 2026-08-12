@@ -1,5 +1,5 @@
 <h1>
-  <img src="/docs/images/ember-logo.png" alt="Ember" height="128" align="center">
+  <img src="/docs/images/ember-logo.png" alt="Ember" height="300" align="center">
   &nbsp;Backend
 </h1>
 
